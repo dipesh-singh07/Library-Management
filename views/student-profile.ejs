@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile | Library Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/student.css">
+</head>
+<body class="student-page-body profile-page-body">
+    <main class="profile-page-shell" id="profile">
+        <header class="profile-page-header">
+            <div>
+                <a class="catalogue-back-link" href="/student">Back to dashboard</a>
+                <h1>Student Profile</h1>
+                <p>Manage your personal, academic, and library information.</p>
+            </div>
+            <% if (!editMode) { %><a class="profile-edit-button" href="/student/profile?edit=true#profile">Edit Profile</a><% } %>
+        </header>
+
+        <% if (error) { %><div class="profile-alert profile-alert-error"><%= error %></div><% } %>
+        <% if (success) { %><div class="profile-alert profile-alert-success"><%= success %></div><% } %>
+
+        <% if (editMode) { %>
+            <form class="profile-edit-form" method="POST" action="/student/profile">
+                <section class="profile-card profile-form-section">
+                    <div class="profile-section-heading"><span>Personal Information</span><small>Required fields are marked with *</small></div>
+                    <div class="profile-form-grid">
+                        <label class="profile-photo-field">Profile Photo URL<input type="url" name="profileImage" value="<%= formData.profileImage %>" placeholder="https://example.com/photo.jpg"></label>
+                        <label>Full Name *<input name="name" value="<%= formData.name %>" required></label>
+                        <label>Email<input value="<%= formData.email %>" readonly></label>
+                        <label>Phone Number<input name="phone" value="<%= formData.phone %>" placeholder="+91 9876543210"></label>
+                        <label>Date of Birth<input type="date" name="dateOfBirth" value="<%= formData.dateOfBirth %>"></label>
+                        <label>Gender<input name="gender" value="<%= formData.gender %>" placeholder="Optional"></label>
+                    </div>
+                </section>
+                <section class="profile-card profile-form-section">
+                    <div class="profile-section-heading"><span>Academic Information</span><small>Keep your student information current.</small></div>
+                    <div class="profile-form-grid">
+                        <label>College Name *<input name="college" value="<%= formData.college %>" required></label>
+                        <label>Course / Degree *<input name="course" value="<%= formData.course %>" required></label>
+                        <label>Branch / Department *<input name="branch" value="<%= formData.branch %>" required></label>
+                        <label>Year *<input name="year" value="<%= formData.year %>" placeholder="2nd Year" required></label>
+                        <label>Semester *<input name="semester" value="<%= formData.semester %>" placeholder="4th Semester" required></label>
+                        <label>Student ID / Enrollment Number *<input name="studentId" value="<%= formData.studentId %>" required></label>
+                        <label>Admission Year *<input name="admissionYear" type="number" min="1900" max="<%= new Date().getFullYear() %>" value="<%= formData.admissionYear %>" required></label>
+                    </div>
+                </section>
+                <section class="profile-card profile-form-section">
+                    <div class="profile-section-heading"><span>Contact / Home Information</span><small>Your email and role cannot be changed here.</small></div>
+                    <div class="profile-form-grid">
+                        <label class="profile-wide-field">Home Address<input name="address" value="<%= formData.address %>"></label>
+                        <label>City<input name="city" value="<%= formData.city %>"></label>
+                        <label>State<input name="state" value="<%= formData.state %>"></label>
+                        <label>Pincode<input name="pincode" value="<%= formData.pincode %>" inputmode="numeric"></label>
+                    </div>
+                </section>
+                <div class="profile-form-actions"><a class="profile-cancel-button" href="/student/profile">Cancel</a><button class="profile-edit-button" type="submit">Save Profile</button></div>
+            </form>
+        <% } else { %>
+            <section class="profile-card profile-identity-card">
+                <div class="profile-avatar">
+                    <% if (student.profileImage) { %><img src="<%= student.profileImage %>" alt="<%= student.name %>"><% } else { %><span><%= student.name ? student.name.trim().charAt(0).toUpperCase() : 'S' %></span><% } %>
+                </div>
+                <div><span class="profile-eyebrow">Student account</span><h2><%= student.name %></h2><p><%= student.email %></p></div>
+            </section>
+            <div class="profile-content-grid">
+                <section class="profile-card"><div class="profile-section-heading"><span>Personal Information</span></div><dl class="profile-facts"><div><dt>Full Name</dt><dd><%= student.name || 'Not provided' %></dd></div><div><dt>Email</dt><dd><%= student.email || 'Not provided' %></dd></div><div><dt>Phone</dt><dd><%= student.phone || 'Not provided' %></dd></div><div><dt>Age</dt><dd><%= age === null ? 'Not provided' : age %></dd></div><div><dt>Date of Birth</dt><dd><%= student.dateOfBirth ? new Date(student.dateOfBirth).toLocaleDateString('en-GB') : 'Not provided' %></dd></div><div><dt>Gender</dt><dd><%= student.gender || 'Not provided' %></dd></div></dl></section>
+                <section class="profile-card"><div class="profile-section-heading"><span>Academic Information</span></div><dl class="profile-facts"><div><dt>College</dt><dd><%= student.college || 'Not provided' %></dd></div><div><dt>Course</dt><dd><%= student.course || 'Not provided' %></dd></div><div><dt>Branch</dt><dd><%= student.branch || 'Not provided' %></dd></div><div><dt>Year</dt><dd><%= student.year || 'Not provided' %></dd></div><div><dt>Semester</dt><dd><%= student.semester || 'Not provided' %></dd></div><div><dt>Student ID</dt><dd><%= student.studentId || 'Not provided' %></dd></div><div><dt>Admission Year</dt><dd><%= student.admissionYear || 'Not provided' %></dd></div></dl></section>
+                <section class="profile-card"><div class="profile-section-heading"><span>Contact / Home Information</span></div><dl class="profile-facts profile-facts-single"><div><dt>Home Address</dt><dd><%= student.address || 'Not provided' %></dd></div><div><dt>City</dt><dd><%= student.city || 'Not provided' %></dd></div><div><dt>State</dt><dd><%= student.state || 'Not provided' %></dd></div><div><dt>Pincode</dt><dd><%= student.pincode || 'Not provided' %></dd></div></dl></section>
+                <section class="profile-card profile-library-card"><div class="profile-section-heading"><span>Library Information</span><a href="/student/books">Browse books</a></div><div class="profile-library-grid"><div><strong><%= libraryStats.totalBorrowed %></strong><span>Total Books Borrowed</span></div><div><strong><%= libraryStats.currentlyIssued %></strong><span>Currently Issued</span></div><div><strong><%= libraryStats.pendingRequests %></strong><span>Pending Requests</span></div><div><strong><%= libraryStats.approvedRequests %></strong><span>Approved Requests</span></div><div><strong><%= libraryStats.returnedBooks %></strong><span>Returned Books</span></div><div><strong><%= libraryStats.overdueBooks %></strong><span>Overdue Books</span></div><div><strong>₹<%= libraryStats.outstandingFine %></strong><span>Outstanding Fine</span></div></div></section>
+            </div>
+        <% } %>
+    </main>
+</body>
+</html>

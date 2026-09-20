@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Portal | Student Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/student.css">
+</head>
+<body class="student-page-body">
+
+    <!-- Cinematic Library Background with Warm Hanging Lamps & Books -->
+    <div class="cinematic-bg-wrapper" aria-hidden="true">
+        <div class="cinematic-bg-image"></div>
+        <div class="cinematic-vignette-overlay"></div>
+
+        <!-- Subtle Floating Foreground Book Elements matching Screenshot 1 -->
+        <div class="floating-book-scene">
+            <div class="hanging-fg-book book-left-dune">
+                <div class="fg-book-string"></div>
+                <div class="fg-book-spine">
+                    <span class="fg-book-cover-title">DUNE</span>
+                </div>
+            </div>
+            <div class="hanging-fg-book book-mid-code">
+                <div class="fg-book-string"></div>
+                <div class="fg-book-spine">
+                    <span class="fg-book-cover-title">Clean Code</span>
+                </div>
+            </div>
+            <div class="hanging-fg-book book-right-potter">
+                <div class="fg-book-string"></div>
+                <div class="fg-book-spine">
+                    <span class="fg-book-cover-title">Harry Potter</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Layout Container: Left Sidebar + Central Content -->
+    <div class="dashboard-layout">
+
+        <!-- ===================================================
+             1. LEFT SIDEBAR NAVIGATION (Matching Screenshot 1)
+             =================================================== -->
+        <aside class="dashboard-sidebar">
+            <!-- Brand / Logo -->
+            <div class="sidebar-brand">
+                <div class="brand-icon-box">
+                    <span class="brand-book-icon">📖</span>
+                </div>
+                <div class="brand-text-wrap">
+                    <h2 class="brand-title">Library Portal</h2>
+                    <span class="brand-tagline">Books Today, A Better Tomorrow</span>
+                </div>
+            </div>
+
+            <!-- Sidebar Navigation Links -->
+            <nav class="sidebar-nav" aria-label="Main Navigation">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="/student" class="nav-link active">
+                            <span class="nav-icon">🏠</span>
+                            <span class="nav-text">Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#search-section" class="nav-link">
+                            <span class="nav-icon">🔍</span>
+                            <span class="nav-text">Search Books</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#issued-section" class="nav-link">
+                            <span class="nav-icon">📖</span>
+                            <span class="nav-text">My Books</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#reading-path-section" class="nav-link">
+                            <span class="nav-icon">🗺️</span>
+                            <span class="nav-text">Reading Path</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#requests-section" class="nav-link">
+                            <span class="nav-icon">📋</span>
+                            <span class="nav-text">My Requests</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/student/profile" class="nav-link">
+                            <span class="nav-icon">👤</span>
+                            <span class="nav-text">Profile</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Bottom Sidebar Literary Quote -->
+            <div class="sidebar-quote-box">
+                <p class="quote-text">“ A reader lives a thousand lives before he dies. ”</p>
+                <span class="quote-author">— George R.R. Martin</span>
+            </div>
+        </aside>
+
+        <!-- ===================================================
+             2. MAIN CONTENT AREA
+             =================================================== -->
+        <div class="dashboard-main-area">
+
+            <!-- Top Right Profile & Header Controls -->
+            <header class="top-header-bar">
+                <div class="header-left-space"></div>
+
+                <div class="header-user-controls">
+                    <!-- Notification Bell -->
+                    <div class="header-notify-wrap" title="Notifications">
+                        <button type="button" class="btn-notify-bell" aria-label="Notifications">
+                            <span>🔔</span>
+                            <span class="notify-red-dot"></span>
+                        </button>
+                    </div>
+
+                    <!-- Student User Pill -->
+                    <div class="student-profile-pill">
+                        <div class="avatar-initial-circle">
+                            <%= student.name ? student.name.trim().charAt(0).toUpperCase() : 'S' %>
+                        </div>
+                        <div class="student-name-meta">
+                            <span class="student-user-name"><%= student.name %></span>
+                            <span class="student-user-role">Student</span>
+                        </div>
+                        <span class="profile-dropdown-arrow">⌄</span>
+                    </div>
+
+                    <!-- Logout Button -->
+                    <a href="/logout" class="btn-header-logout" id="logout-btn">Logout</a>
+                </div>
+            </header>
+
+            <!-- Main Scrollable Dashboard Content -->
+            <main class="dashboard-content">
+
+                <!-- Alert Message for Book Request Success -->
+                <% if (requestSuccess) { %>
+                    <div class="alert-banner-success" id="req-success-alert">
+                        <span class="alert-icon">✓</span>
+                        <div class="alert-text">
+                            <strong>Book request submitted successfully.</strong> Your request for <em>"<%= requestedTitle %>"</em> is now pending librarian review.
+                        </div>
+                        <button type="button" class="btn-close-alert" onclick="this.parentElement.style.display='none'">✕</button>
+                    </div>
+                <% } %>
+
+
+                <!-- Alert for request errors (duplicate, validation, etc.) -->
+                <% if (requestError) { %>
+                    <div class="alert-banner-error" id="req-error-alert">
+                        <span class="alert-icon">⚠</span>
+                        <div class="alert-text">
+                            <% if (requestError === 'TitleRequired') { %>
+                                Please enter a book title before submitting your request.
+                            <% } else if (requestError === 'ServerFailure') { %>
+                                We couldn't submit your request right now. Please try again shortly.
+                            <% } else { %>
+                                <%= decodeURIComponent(requestError) %>
+                            <% } %>
+                        </div>
+                        <button type="button" class="btn-close-alert" onclick="this.parentElement.style.display='none'">✕</button>
+                    </div>
+                <% } %>
+
+                <!-- Loan / issue messages -->
+                <% if (loanMessage) { %>
+                    <%
+                        const isErrorMsg = loanMessage.toLowerCase().includes('unable') ||
+                                          loanMessage.toLowerCase().includes('not found') ||
+                                          loanMessage.toLowerCase().includes('unavailable') ||
+                                          loanMessage.toLowerCase().includes('invalid') ||
+                                          loanMessage.toLowerCase().includes('already');
+                        const isWarnMsg = loanMessage.toLowerCase().includes('fine') ||
+                                         loanMessage.toLowerCase().includes('overdue');
+                    %>
+                    <div class="<%= isErrorMsg ? 'alert-banner-error' : isWarnMsg ? 'alert-banner-warn' : 'alert-banner-success' %>" id="loan-msg-alert">
+                        <span class="alert-icon"><%= isErrorMsg ? '⚠' : isWarnMsg ? '⚠' : '✓' %></span>
+                        <div class="alert-text"><%= loanMessage %></div>
+                        <button type="button" class="btn-close-alert" onclick="this.parentElement.style.display='none'">✕</button>
+                    </div>
+                <% } %>
+
+                <!-- ===================================================
+                     3. LARGE WELCOME & SEARCH HERO (Screenshot 1)
+                     =================================================== -->
+                <section class="welcome-hero-section" id="search-section">
+                    <h1 class="welcome-title">
+                        Welcome Back, <span class="welcome-gold-name"><%= student.name %>!</span> 👋
+                    </h1>
+                    <p class="welcome-subtitle">“The more you read, the more you see.”</p>
+
+                    <!-- Main Search Bar -->
+                    <div class="main-search-wrapper">
+                        <form action="/student#search-section" method="GET" class="main-search-form">
+                            <span class="search-magnifier-icon">🔍</span>
+                            <input 
+                                type="text" 
+                                name="q" 
+                                placeholder="what should I study to learn backend development?" 
+                                value="<%= searchQuery %>"
+                                class="main-search-input"
+                                id="dashboard-search-input"
+                                autocomplete="off"
+                            >
+                            <div class="search-filter-dropdown">
+                                <select name="filter" class="search-filter-select" aria-label="Filter Search">
+                                    <option value="all">All</option>
+                                    <option value="path">Learning Paths</option>
+                                    <option value="books">Library Books</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-main-search">Search</button>
+                        </form>
+                    </div>
+
+                    <!-- Suggestion Chips Row -->
+                    <div class="search-suggestions-row">
+                        <span class="suggestions-prompt">Try searching for a book, author, topic, or ask something like:</span>
+                        <div class="suggestions-chips-group">
+                            <a href="/student?q=I+want+to+learn+backend#reading-path-section" class="search-chip">"I want to learn backend"</a>
+                            <a href="/student?q=Raj+Comics+reading+order#reading-path-section" class="search-chip">"Raj Comics reading order"</a>
+                            <a href="/student?q=Is+The+Alchemist+in+library%3F#search-results-section" class="search-chip">"Is The Alchemist in library?"</a>
+                            <a href="/student?q=Best+books+for+DSA#reading-path-section" class="search-chip">"Best books for DSA"</a>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Search Results (If library search executed) -->
+                <% if (searchPerformed && !hasActivePath) { %>
+                    <section class="search-results-section" id="search-results-section">
+                        <div class="section-card-header">
+                            <div class="header-title-left">
+                                <span class="card-icon-round icon-blue">🔍</span>
+                                <div>
+                                    <h3 class="card-main-title"><%= isExternalDiscovery ? 'Book Discovery Results' : 'Library Search Results' %></h3>
+                                    <p class="card-sub-title">Results for "<%= searchQuery %>"</p>
+                                </div>
+                            </div>
+                            <a href="/student" class="card-action-link">Clear Results ✕</a>
+                        </div>
+
+                        <div class="card-inner-panel">
+                            <% if (searchResults && searchResults.length > 0) { %>
+                                <div class="books-display-grid">
+                                    <% searchResults.forEach(book => { %>
+                                        <div class="library-book-card <%= book.isCompleted ? 'book-completed-state' : '' %>">
+                                            <div class="book-cover-area">
+                                                <% if (book.image) { %>
+                                                    <img src="<%= book.image %>" alt="<%= book.title %>" class="book-img" loading="lazy">
+                                                <% } else { %>
+                                                    <div class="book-placeholder-cover">
+                                                        <span class="placeholder-glyph">📖</span>
+                                                        <span class="placeholder-tag"><%= book.category %></span>
+                                                    </div>
+                                                <% } %>
+                                                <% if (book.isCompleted) { %>
+                                                    <span class="completed-pill">✓ Completed</span>
+                                                <% } %>
+                                            </div>
+                                            <div class="book-info-area">
+                                                <span class="book-genre"><%= book.category %></span>
+                                                <h4 class="book-name" title="<%= book.title %>"><%= book.title %></h4>
+                                                <p class="book-by">By <%= book.author %></p>
+                                                <% if (book.isbn) { %>
+                                                    <p class="book-isbn">ISBN: <%= book.isbn %></p>
+                                                <% } %>
+                                                
+                                                <div class="book-copies-row">
+                                                    <span>Available: <strong><%= book.availableCopies %> / <%= book.totalCopies %></strong></span>
+                                                </div>
+
+                                                <div class="book-status-row">
+                                                    <% if (book.displayStatus === 'reserved') { %>
+                                                        <span class="badge-status badge-out-stock">RESERVED / REQUESTED</span>
+                                                        <span class="return-date-badge">Expected availability: <%= book.earliestExpectedDate || 'Not available yet' %></span>
+                                                    <% } else if (book.displayStatus === 'available' || book.availableCopies > 0) { %>
+                                                        <span class="badge-status badge-in-stock">AVAILABLE</span>
+                                                        <% if (book.location && (book.location.shelf || book.location.floor)) { %>
+                                                            <span class="location-badge">📍 Floor <%= book.location.floor || '1' %>, Shelf <%= book.location.shelf || 'General' %></span>
+                                                        <% } %>
+                                                    <% } else { %>
+                                                        <span class="badge-status badge-out-stock"><%= book.displayStatus === 'issued' ? 'CURRENTLY ISSUED' : 'UNAVAILABLE' %></span>
+                                                        <span class="return-date-badge">Expected availability: <%= book.earliestExpectedDate || book.expectedAvailability || 'Not available yet' %></span>
+                                                    <% } %>
+                                                    <a class="card-action-link" href="/student/books/<%= book._id %>">View Details</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            <% } else { %>
+                                <div class="empty-panel-box">
+                                    <span class="empty-big-icon">📖</span>
+                                    <% if (isExternalDiscovery) { %>
+                                        <h4 class="empty-title">No external books found.</h4>
+                                        <p class="empty-desc">We couldn't find external book results matching "<%= searchQuery %>".</p>
+                                    <% } else { %>
+                                        <h4 class="empty-title">Not currently available in our library.</h4>
+                                        <p class="empty-desc">We couldn't find any copy matching "<%= searchQuery %>" in our library collection.</p>
+                                        <button type="button" class="btn-request-action" onclick="openRequestModal('<%= searchQuery.replace(/'/g, "\\'") %>', '')">
+                                            ✍️ Request this book
+                                        </button>
+                                    <% } %>
+                                </div>
+                            <% } %>
+                        </div>
+                    </section>
+                <% } %>
+
+                <!-- ===================================================
+                     4. STATISTICS CARDS ROW (4 Cards in Screenshot 1)
+                     =================================================== -->
+                <section class="stats-row-section" aria-label="Student Statistics">
+                    <div class="stats-cards-grid">
+                        <!-- Stat Card 1: Currently Issued -->
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper stat-bg-purple">
+                                <span class="stat-icon">📖</span>
+                            </div>
+                            <div class="stat-text-wrapper">
+                                <span class="stat-number"><%= stats.currentlyIssuedCount %></span>
+                                <h3 class="stat-heading">Currently Issued</h3>
+                                <p class="stat-subtext">Books you are reading now</p>
+                            </div>
+                        </div>
+
+                        <!-- Stat Card 2: Completed Books -->
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper stat-bg-emerald">
+                                <span class="stat-icon">✓</span>
+                            </div>
+                            <div class="stat-text-wrapper">
+                                <span class="stat-number"><%= stats.completedBooksCount %></span>
+                                <h3 class="stat-heading">Completed Books</h3>
+                                <p class="stat-subtext">Books you have returned</p>
+                            </div>
+                        </div>
+
+                        <!-- Stat Card 3: Total Borrowed -->
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper stat-bg-blue">
+                                <span class="stat-icon">📚</span>
+                            </div>
+                            <div class="stat-text-wrapper">
+                                <span class="stat-number"><%= stats.totalBorrowedCount %></span>
+                                <h3 class="stat-heading">Total Borrowed</h3>
+                                <p class="stat-subtext">Total books you have taken</p>
+                            </div>
+                        </div>
+
+                        <!-- Stat Card 4: Keep Reading! -->
+                        <div class="stat-card">
+                            <div class="stat-icon-wrapper stat-bg-amber">
+                                <span class="stat-icon">🎯</span>
+                            </div>
+                            <div class="stat-text-wrapper">
+                                <h3 class="stat-heading stat-gold-highlight">Keep Reading!</h3>
+                                <p class="stat-subtext">Every book adds a new story to your journey.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="dashboard-card library-summary-card" aria-labelledby="my-library-title">
+                    <div class="section-card-header">
+                        <div class="header-title-left">
+                            <span class="card-icon-round icon-emerald">📚</span>
+                            <div><h3 class="card-main-title" id="my-library-title">My Library</h3><p class="card-sub-title">Your current borrowing and request status.</p></div>
+                        </div>
+                    </div>
+                    <% const summary = librarySummary || {}; %>
+                    <div class="library-summary-grid">
+                        <div><strong><%= summary.currentlyBorrowed || 0 %></strong><span>Currently Borrowed</span></div>
+                        <div><strong><%= summary.pendingRequests || 0 %></strong><span>Pending Requests</span></div>
+                        <div><strong><%= summary.approvedRequests || 0 %></strong><span>Approved Requests</span></div>
+                        <div><strong><%= summary.overdueBooks || 0 %></strong><span>Overdue Books</span></div>
+                        <div><strong>₹<%= summary.outstandingFine || 0 %></strong><span>Outstanding Fine</span><a class="card-action-link" href="#fine-section">View Details →</a></div>
+                    </div>
+                </section>
+
+                <section class="dashboard-card" id="fine-section" aria-labelledby="fine-title">
+                    <div class="section-card-header">
+                        <div class="header-title-left">
+                            <span class="card-icon-round icon-amber">₹</span>
+                            <div><h3 class="card-main-title" id="fine-title">Fine Details</h3><p class="card-sub-title">Final amounts charged by the librarian.</p></div>
+                        </div>
+                    </div>
+                    <% if (fineRecords && fineRecords.length) { %>
+                        <div class="table-scroll-container">
+                            <table class="history-clean-table">
+                                <thead><tr><th>Book</th><th>Fine Type</th><th>Issue Date</th><th>Due Date</th><th>Return Date</th><th>Fine</th><th>Status</th></tr></thead>
+                                <tbody>
+                                    <% fineRecords.forEach(record => { %>
+                                        <tr>
+                                            <td><strong class="tbl-book-title"><%= record.book ? record.book.title : 'Book' %></strong></td>
+                                            <td><%= record.fineType === 'late' ? 'Late Return' : record.fineType === 'damaged' ? 'Damaged Book' : record.fineType === 'lost' ? 'Lost Book' : 'No Fine' %></td>
+                                            <td><%= formatDate(record.issueDate) %></td>
+                                            <td><%= formatDate(record.dueDate) %></td>
+                                            <td><%= record.returnDate ? formatDate(record.returnDate) : '—' %></td>
+                                            <td><strong>₹<%= record.chargedFine %></strong></td>
+                                            <td><span class="status-badge-clean <%= record.chargedFine > 0 ? 'badge-out-stock' : 'badge-returned' %>"><%= record.fineStatus %></span></td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    <% } else { %>
+                        <div class="empty-panel-box"><h4 class="empty-title">No fine records.</h4><p class="empty-desc">You have no finalized fines in your lending history.</p></div>
+                    <% } %>
+                </section>
+
+                <!-- ===================================================
+                     5. YOUR READING / LEARNING PATH (Large Card in Screenshot 1)
+                     =================================================== -->
+                <section class="dashboard-card path-feature-card" id="reading-path-section">
+                    <div class="section-card-header">
+                        <div class="header-title-left">
+                            <span class="card-icon-round icon-emerald">🗺️</span>
+                            <div>
+
+                                <div class="title-with-badge">
+                                    <h3 class="card-main-title">Your Reading / Learning Path</h3>
+                                    <span class="ai-powered-badge">✨ AI-Powered Understanding</span>
+                                </div>
+                                <p class="card-sub-title">Tell us what you want to learn or read, and we'll suggest a clear path for you.</p>
+                            </div>
+                        </div>
+                        <a href="/student#reading-path-section" class="card-action-link">View All Paths →</a>
+                    </div>
+
+                    <div class="card-inner-panel path-inner-panel">
+                        <% if (!hasActivePath) { %>
+                            <!-- Unsearched / Default State: Graphic with Dotted Path matching Screenshot 1 -->
+                            <div class="path-placeholder-graphic-box">
+                                <div class="dotted-path-flow" aria-hidden="true">
+                                    <span class="path-book-ghost ghost-1">📖</span>
+                                    <span class="path-dot-line">••••••••••</span>
+                                    <span class="path-book-ghost ghost-2">📖</span>
+                                    <span class="path-dot-line">••••••••••</span>
+                                    <span class="path-book-center-hero">📖</span>
+                                    <span class="path-dot-line">••••••••••</span>
+                                    <span class="path-book-ghost ghost-3">📖</span>
+                                    <span class="path-dot-line">••••••••••</span>
+                                    <span class="path-book-ghost ghost-4">📖</span>
+                                </div>
+
+                                <h4 class="path-guide-heading">Search to get your personalized reading path</h4>
+                                <p class="path-guide-subtext">Try prompts like:</p>
+                                
+                                <div class="path-prompt-examples">
+                                    <a href="/student?q=I+want+to+learn+backend+development#reading-path-section" class="prompt-link-example">“I want to learn backend development”</a>
+                                    <a href="/student?q=Suggest+books+for+web+development#reading-path-section" class="prompt-link-example">“Suggest books for web development”</a>
+                                    <a href="/student?q=Raj+Comics+reading+order#reading-path-section" class="prompt-link-example">“Raj Comics reading order”</a>
+                                    <a href="/student?q=Best+books+to+start+with+machine+learning#reading-path-section" class="prompt-link-example">“Best books to start with machine learning”</a>
+                                </div>
+                            </div>
+                        <% } else { %>
+                            <!-- Active Generated Reading / Learning Path Sequence -->
+                            <div class="active-path-container">
+                                <div class="active-path-header">
+                                    <div>
+                                        <span class="active-path-level"><%= readingPath.level %></span>
+                                        <h4 class="active-path-title">🎯 <%= readingPath.title %></h4>
+                                        <p class="active-path-desc"><%= readingPath.description %></p>
+                                    </div>
+                                    <div class="active-path-badge-count">
+                                        <span><%= readingPath.steps.length %> Ordered Steps</span>
+                                    </div>
+                                </div>
+
+                                <!-- Horizontal Scrolling Step Sequence -->
+                                <div class="path-steps-timeline">
+                                    <% readingPath.steps.forEach((step, idx) => { %>
+                                        <div class="path-step-item <%= step.isCompleted ? 'step-completed-dim' : '' %>">
+                                            <div class="step-card">
+                                                <div class="step-card-top">
+                                                    <span class="step-index-tag">Step <%= String(step.stepNumber).padStart(2, '0') %></span>
+                                                    <% if (step.isCompleted) { %>
+                                                        <span class="badge-completed-step">✓ Completed</span>
+                                                    <% } %>
+                                                </div>
+
+                                                <div class="step-cover-wrapper">
+                                                    <% if (step.coverUrl) { %>
+                                                        <img 
+                                                            src="<%= step.coverUrl %>" 
+                                                            alt="<%= step.title %>" 
+                                                            class="step-cover-photo" 
+                                                            loading="lazy"
+                                                            onerror="this.onerror=null; this.src=''; this.classList.add('img-fallback-active');"
+                                                        >
+                                                    <% } %>
+                                                    <div class="step-cover-placeholder <%= !step.coverUrl ? 'placeholder-visible' : '' %>">
+                                                        <span class="placeholder-icon">📘</span>
+                                                        <span class="placeholder-name"><%= step.title %></span>
+                                                        <span class="placeholder-note">Cover not available</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="step-body-content">
+                                                    <span class="step-tag"><%= step.category %></span>
+                                                    <h5 class="step-title" title="<%= step.title %>"><%= step.title %></h5>
+                                                    <% if (step.subtitle) { %>
+                                                        <p class="step-subtitle"><%= step.subtitle %></p>
+                                                    <% } %>
+                                                    <p class="step-author">By <%= step.author %></p>
+
+                                                    <div class="step-why-box">
+                                                        <span class="why-icon">💡</span>
+                                                        <p class="why-text"><%= step.reason %></p>
+                                                    </div>
+
+                                                    <% if (step.prerequisite) { %>
+                                                        <p class="step-prereq-note"><span class="label">Prereq:</span> <%= step.prerequisite %></p>
+                                                    <% } %>
+
+                                                    <!-- Library availability belongs only to library-backed paths. -->
+                                                    <% if (!isExternalDiscovery) { %>
+                                                    <div class="step-availability-status">
+                                                        <% if (step.inLibrary) { %>
+                                                            <% if (step.availabilityStatus === 'available') { %>
+                                                                <div class="avail-indicator avail-in-library">
+                                                                    <span>✓ Available in Library</span>
+                                                                    <% if (step.locationDetails) { %>
+                                                                        <span class="loc-sub"><%= step.locationDetails %></span>
+                                                                    <% } %>
+                                                                </div>
+                                                            <% } else { %>
+                                                                <div class="avail-indicator avail-out-library">
+                                                                    <span>🔴 Currently Unavailable</span>
+                                                                    <span class="loc-sub">Expected: <%= step.expectedReturnDate %></span>
+                                                                </div>
+                                                            <% } %>
+                                                        <% } else { %>
+                                                            <div class="avail-indicator avail-not-library">
+                                                                <span>Not currently in our library</span>
+                                                                <button 
+                                                                    type="button" 
+                                                                    class="btn-step-request" 
+                                                                    onclick="openRequestModal('<%= step.title.replace(/'/g, "\\'") %>', '<%= step.author.replace(/'/g, "\\'") %>')"
+                                                                >
+                                                                    ✍️ Request this book
+                                                                </button>
+                                                            </div>
+                                                        <% } %>
+                                                    </div>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+
+                                            <% if (idx < readingPath.steps.length - 1) { %>
+                                                <div class="timeline-step-arrow" aria-hidden="true">→</div>
+                                            <% } %>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                </section>
+
+                <!-- ===================================================
+                     6. 2x2 BOTTOM CARDS GRID (Screenshot 1)
+                     =================================================== -->
+                <div class="bottom-sections-grid">
+
+                    <!-- Grid Item 1: Library Catalogue -->
+                    <section class="dashboard-card" id="catalogue-section">
+                        <div class="section-card-header">
+                            <div class="header-title-left">
+                                <span class="card-icon-round icon-amber">📖</span>
+                                <div>
+                                    <h3 class="card-main-title">Library Catalogue</h3>
+                                    <p class="card-sub-title">Explore all books available in our library.</p>
+                                </div>
+                            </div>
+                            <a href="/student/books" class="card-action-link">View All →</a>
+                        </div>
+
+                        <div class="card-inner-panel">
+                            <% if (catalogueBooks && catalogueBooks.length > 0) { %>
+                                <div class="books-display-grid">
+                                    <% catalogueBooks.forEach(book => { %>
+                                        <div class="library-book-card <%= book.isCompleted ? 'book-completed-state' : '' %>">
+                                            <div class="book-cover-area">
+                                                <% if (book.image) { %>
+                                                    <img src="<%= book.image %>" alt="<%= book.title %>" class="book-img" loading="lazy">
+                                                <% } else { %>
+                                                    <div class="book-placeholder-cover">
+                                                        <span class="placeholder-glyph">📖</span>
+                                                        <span class="placeholder-tag"><%= book.category %></span>
+                                                    </div>
+                                                <% } %>
+                                                <% if (book.isCompleted) { %>
+                                                    <span class="completed-pill">✓ Completed</span>
+                                                <% } %>
+                                            </div>
+                                            <div class="book-info-area">
+                                                <span class="book-genre"><%= book.category %></span>
+                                                <h4 class="book-name"><%= book.title %></h4>
+                                                <p class="book-by">By <%= book.author %></p>
+                                                <div class="book-copies-row">
+                                                    <span>Available: <strong><%= book.availableCopies %> / <%= book.totalCopies %></strong></span>
+                                                </div>
+                                                <% if (book.availableCopies > 0) { %>
+                                                    <span class="badge-status badge-in-stock">AVAILABLE</span>
+                                                    <form action="/student/request-book" method="POST">
+                                                        <input type="hidden" name="bookId" value="<%= book._id %>">
+                                                        <input type="hidden" name="title" value="<%= book.title %>">
+                                                        <input type="hidden" name="author" value="<%= book.author %>">
+                                                        <button type="submit" class="btn-modal-submit">Request Book</button>
+                                                    </form>
+                                                <% } else { %>
+                                                    <span class="badge-status badge-out-stock">CURRENTLY UNAVAILABLE</span>
+                                                    <span class="return-date-badge">Expected availability: <%= book.expectedAvailability || 'Not available yet' %></span>
+                                                <% } %>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            <% } else { %>
+                                <!-- Empty state strictly as in Screenshot 1 & Rule 16 -->
+                                <div class="empty-panel-box">
+                                    <span class="empty-big-icon">📖</span>
+                                    <h4 class="empty-title">No books available in the library yet.</h4>
+                                    <p class="empty-desc">Books will appear here once they are added by the librarian.</p>
+                                </div>
+                            <% } %>
+                        </div>
+                    </section>
+
+                    <!-- Grid Item 2: My Currently Issued Books -->
+                    <section class="dashboard-card" id="issued-section">
+                        <div class="section-card-header">
+                            <div class="header-title-left">
+                                <span class="card-icon-round icon-amber">⏰</span>
+                                <div>
+                                    <h3 class="card-main-title">My Currently Issued Books</h3>
+                                    <p class="card-sub-title">Books you have actively checked out.</p>
+                                </div>
+                            </div>
+                            <a href="#issued-section" class="card-action-link">View All →</a>
+                        </div>
+
+                        <div class="card-inner-panel">
+                            <% if (currentlyIssued && currentlyIssued.length > 0) { %>
+                                <div class="issued-books-list">
+                                    <% currentlyIssued.forEach(record => { %>
+                                        <div class="issued-item-card">
+                                            <div class="issued-cover-thumb">
+                                                <% if (record.book && record.book.image) { %>
+                                                    <img src="<%= record.book.image %>" alt="<%= record.book.title %>" class="thumb-img" loading="lazy">
+                                                <% } else { %>
+                                                    <span class="thumb-placeholder">📘</span>
+                                                <% } %>
+                                            </div>
+                                            <div class="issued-info-meta">
+                                                <h4 class="issued-title"><%= record.book ? record.book.title : 'Book' %></h4>
+                                                <p class="issued-author">By <%= record.book ? record.book.author : 'Unknown' %></p>
+                                                <div class="issued-dates">
+                                                    <span>Issued: <%= formatDate(record.issueDate) %></span>
+                                                    <span class="due-highlight">Due: <%= formatDate(record.dueDate) %></span>
+                                                </div>
+                                                <div class="issued-dates">
+                                                    <span class="status-badge-clean <%= record.currentOverdueDays > 0 ? 'badge-out-stock' : 'badge-issued' %>"><%= record.currentOverdueDays > 0 ? 'OVERDUE' : 'ON TIME' %></span>
+                                                    <span><%= record.currentOverdueDays > 0 ? 'Overdue by ' + record.currentOverdueDays + ' days' : record.loanStatusLabel %></span>
+                                                    <span>Current fine: ₹<%= record.currentFine %></span>
+                                                </div>
+                                                <div class="modal-actions">
+                                                    <% if (record.renewalCount < 1 && record.currentOverdueDays === 0) { %>
+                                                        <form action="/student/renew-book" method="POST">
+                                                            <input type="hidden" name="loanId" value="<%= record._id %>">
+                                                            <button type="submit" class="btn-modal-submit">Renew Book</button>
+                                                        </form>
+                                                    <% } %>
+                                                    <span class="catalogue-action-note">Return at the library counter</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            <% } else { %>
+                                <!-- Empty state matching Screenshot 1 -->
+                                <div class="empty-panel-box">
+                                    <span class="empty-big-icon">📖</span>
+                                    <h4 class="empty-title">You currently have no borrowed books.</h4>
+                                    <p class="empty-desc">Books you borrow will appear here with their due date and fine.</p>
+                                </div>
+                            <% } %>
+                        </div>
+                    </section>
+
+                    <!-- Grid Item 3: My Borrowing History -->
+                    <section class="dashboard-card" id="history-section">
+                        <div class="section-card-header">
+                            <div class="header-title-left">
+                                <span class="card-icon-round icon-teal">📜</span>
+                                <div>
+                                    <h3 class="card-main-title">My Borrowing History</h3>
+                                    <p class="card-sub-title">Past and completed reading history.</p>
+                                </div>
+                            </div>
+                            <a href="#history-section" class="card-action-link">View All →</a>
+                        </div>
+
+                        <div class="card-inner-panel">
+                            <% if (borrowingHistory && borrowingHistory.length > 0) { %>
+                                <div class="table-scroll-container">
+                                    <table class="history-clean-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Book</th>
+                                                <th>Issue Date</th>
+                                                    <th>Due Date</th>
+                                                    <th>Submission</th>
+                                                <th>Status</th>
+                                                    <th>Fine</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <% borrowingHistory.forEach(record => { %>
+                                                <tr class="<%= record.status === 'returned' ? 'history-returned-row' : '' %>">
+                                                    <td>
+                                                        <strong class="tbl-book-title"><%= record.book ? record.book.title : 'Book' %></strong>
+                                                        <span class="tbl-book-author"><%= record.book ? record.book.author : '' %></span>
+                                                        <span class="tbl-book-author">Renewals: <%= record.renewalCount %>/1</span>
+                                                    </td>
+                                                    <td><%= formatDate(record.issueDate) %></td>
+                                                    <td><%= formatDate(record.dueDate) %></td>
+                                                    <td><%= record.returnDate ? formatDate(record.returnDate) : '—' %></td>
+                                                    <td>
+                                                        <% if (record.status === 'returned') { %>
+                                                            <span class="status-badge-clean badge-returned">Returned</span>
+                                                        <% } else if (record.status === 'lost') { %>
+                                                            <span class="status-badge-clean badge-issued">Lost</span>
+                                                        <% } else if (record.status === 'damaged') { %>
+                                                            <span class="status-badge-clean badge-issued">Damaged — <%= record.damageLevel %></span>
+                                                        <% } else { %>
+                                                            <span class="status-badge-clean badge-issued">Reading</span>
+                                                        <% } %>
+                                                    </td>
+                                                    <td>₹<%= record.fine ?? record.lostFine ?? record.damageFine ?? 0 %></td>
+                                                </tr>
+                                            <% }); %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            <% } else { %>
+                                <!-- Empty state matching Screenshot 1 -->
+                                <div class="empty-panel-box">
+                                    <h4 class="empty-title">No borrowing history yet.</h4>
+                                    <p class="empty-desc">Your past and completed books will be shown here.</p>
+                                </div>
+                            <% } %>
+                        </div>
+                    </section>
+
+                    <!-- Grid Item 4: Book Requests -->
+                    <section class="dashboard-card" id="requests-section">
+                        <div class="section-card-header">
+                            <div class="header-title-left">
+                                <span class="card-icon-round icon-amber">📑</span>
+                                <div>
+                                    <h3 class="card-main-title">Book Requests</h3>
+                                    <p class="card-sub-title">Track your suggestions and requests to the librarian.</p>
+                                </div>
+                            </div>
+                            <button type="button" class="btn-card-header-action" onclick="openRequestModal('', '')">+ Request a Book</button>
+                        </div>
+
+                        <div class="card-inner-panel">
+                            <% if (myRequests && myRequests.length > 0) { %>
+                                <div class="requests-list">
+                                    <% myRequests.forEach(reqItem => { %>
+                                        <%
+                                            const statusConfig = {
+                                                pending:  { icon: '⏳', label: 'REQUEST PENDING',  desc: 'The librarian has not yet reviewed this request.' },
+                                                approved: { icon: '✅', label: 'REQUEST APPROVED',          desc: 'Waiting for librarian to issue the book.' },
+                                                rejected: { icon: '❌', label: 'REQUEST REJECTED',  desc: reqItem.rejectionReason ? ('Reason: ' + reqItem.rejectionReason) : 'This request was not approved.' },
+                                                issued:   { icon: '📖', label: 'CURRENTLY BORROWED',       desc: 'The book has been issued to you. Check your My Books section.' },
+                                                returned: { icon: '↩', label: 'RETURNED', desc: 'This request has been completed.' },
+                                                cancelled:{ icon: '🚫', label: 'Cancelled',         desc: 'This request was cancelled.' }
+                                            };
+                                            const sc = statusConfig[reqItem.status] || { icon: '📋', label: reqItem.status, desc: '' };
+                                        %>
+                                        <div class="request-item-card">
+                                            <div class="req-title-row">
+                                                <h5 class="req-book-name"><%= reqItem.title %></h5>
+                                                <span class="req-status-pill status-<%= reqItem.status %>">
+                                                    <%= sc.icon %> <%= sc.label %>
+                                                </span>
+                                            </div>
+                                            <% if (reqItem.author) { %>
+                                                <p class="req-author">Author: <%= reqItem.author %></p>
+                                            <% } %>
+                                            <p class="req-status-desc"><%= sc.desc %></p>
+                                            <span class="req-date">Requested on <%= formatDate(reqItem.requestDate) %></span>
+                                        </div>
+                                    <% }); %>
+                                </div>
+                            <% } else { %>
+                                <!-- Empty state matching Screenshot 1 -->
+                                <div class="empty-panel-box">
+                                    <h4 class="empty-title">You haven't made any book requests yet.</h4>
+                                    <p class="empty-desc">Request a book if you can't find it in the library.</p>
+                                    <button type="button" class="btn-request-action" onclick="openRequestModal('', '')">
+                                        + Request a Book
+                                    </button>
+                                </div>
+                            <% } %>
+                        </div>
+                    </section>
+
+                </div>
+
+            </main>
+
+            <!-- Dashboard Footer -->
+            <footer class="dashboard-footer">
+                <p>© 2026 Library Management System · Student Portal</p>
+            </footer>
+
+        </div>
+    </div>
+
+    <!-- ===================================================
+         BOOK REQUEST MODAL (Clean & Responsive)
+         =================================================== -->
+    <div id="request-book-modal" class="modal-backdrop" style="display: none;">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">✍️ Request a Book</h3>
+                <button type="button" class="btn-modal-close" onclick="closeRequestModal()">✕</button>
+            </div>
+            <form action="/student/request-book" method="POST" class="modal-form">
+                <div class="form-field">
+                    <label for="modal-req-title" class="form-field-label">Book Title <span class="star">*</span></label>
+                    <input 
+                        type="text" 
+                        id="modal-req-title" 
+                        name="title" 
+                        placeholder="e.g. Clean Architecture, The Alchemist" 
+                        class="form-field-input" 
+                        required
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="modal-req-author" class="form-field-label">Author (Optional)</label>
+                    <input 
+                        type="text" 
+                        id="modal-req-author" 
+                        name="author" 
+                        placeholder="e.g. Robert C. Martin" 
+                        class="form-field-input"
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="modal-req-message" class="form-field-label">Study Goal / Message (Optional)</label>
+                    <textarea 
+                        id="modal-req-message" 
+                        name="message" 
+                        rows="3" 
+                        placeholder="Tell the librarian why you need this book (e.g. for backend roadmap study, exam preparation)" 
+                        class="form-field-textarea"
+                    ></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" onclick="closeRequestModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-submit">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Interactive Scripts for Modal & Pre-fill -->
+    <script>
+        function openRequestModal(title, author) {
+            const modal = document.getElementById('request-book-modal');
+            const titleInput = document.getElementById('modal-req-title');
+            const authorInput = document.getElementById('modal-req-author');
+            
+            if (titleInput) titleInput.value = title || '';
+            if (authorInput) authorInput.value = author || '';
+            if (modal) modal.style.display = 'flex';
+            if (titleInput) titleInput.focus();
+        }
+
+        function closeRequestModal() {
+            const modal = document.getElementById('request-book-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        // Close modal when clicking on backdrop
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('request-book-modal');
+            if (e.target === modal) {
+                closeRequestModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Librarian Dashboard | Library Management System</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/librarian.css">
+</head>
+<body class="librarian-page">
+    <div class="librarian-atmosphere" aria-hidden="true"></div>
+    <div class="librarian-layout">
+        <aside class="librarian-sidebar">
+            <a class="librarian-brand" href="/librarian">
+                <span class="librarian-brand-mark">▥</span>
+                <span><strong>Library</strong><small>Management</small></span>
+            </a>
+            <nav class="librarian-sidebar-nav" aria-label="Librarian navigation">
+                <a class="is-active" href="/librarian"><span>⌂</span>Home</a>
+                <a href="/librarian/books"><span>▤</span>Books</a>
+                <a href="#students"><span>♙</span>Students</a>
+                <a href="#issue-returns"><span>⇄</span>Issue &amp; Returns</a>
+                <a href="#requests"><span>▣</span>Book Requests</a>
+                <a href="#fines"><span>₹</span>Fines</a>
+                <a href="#reports"><span>◫</span>Reports</a>
+                <a href="#qr-management"><span>⌗</span>QR Management</a>
+                <a href="#settings"><span>⚙</span>Settings</a>
+            </nav>
+            <div class="librarian-sidebar-footer">
+                <span class="librarian-footer-emblem">♜</span>
+                <span>Knowledge<br>Builds<br>Brighter Tomorrows</span>
+            </div>
+        </aside>
+
+        <main class="librarian-main">
+            <header class="librarian-topbar">
+                <div class="librarian-search-shell">
+                    <span>⌕</span>
+                    <input type="search" placeholder="Search your library" aria-label="Search your library">
+                    <kbd>⌘ K</kbd>
+                </div>
+                <div class="librarian-profile">
+                    <button class="librarian-notification" type="button" aria-label="Notifications">♢</button>
+                    <span class="librarian-avatar"><%= librarian.name.trim().charAt(0).toUpperCase() %></span>
+                    <span class="librarian-profile-name"><%= librarian.name %><small>Librarian</small></span>
+                    <a class="librarian-logout" href="/logout">Logout</a>
+                </div>
+            </header>
+
+            <div class="librarian-shell">
+                <header class="librarian-header">
+                    <div>
+                        <span class="librarian-eyebrow">Thursday · Library overview</span>
+                        <h1 class="librarian-title">Welcome Back, <span>📚 <%= librarian.name %>!</span></h1>
+                        <p class="librarian-subtitle">Manage books, support readers, and keep knowledge flowing.</p>
+                    </div>
+                    <div class="librarian-header-accent">✦ <span>Make every shelf count</span></div>
+                </header>
+
+        <% if (success) { %>
+            <div class="librarian-alert librarian-alert-success"><%= success %></div>
+        <% } %>
+        <% if (error) { %>
+            <div class="librarian-alert librarian-alert-error"><%= error %></div>
+        <% } %>
+
+        <section aria-labelledby="overview-title">
+            <h2 class="librarian-section-title" id="overview-title">Overview</h2>
+            <div class="librarian-stats">
+                <a class="librarian-stat" href="/librarian/books?all=true#books"><span class="librarian-stat-label">Total Books</span><strong class="librarian-stat-value"><%= dashboardStats.totalBooks %></strong><small>Different books in library</small></a>
+                <div class="librarian-stat"><span class="librarian-stat-label">Available Books</span><strong class="librarian-stat-value"><%= dashboardStats.availableBooks || 0 %></strong><small>Books currently available</small></div>
+                <div class="librarian-stat"><span class="librarian-stat-label">Currently Issued</span><strong class="librarian-stat-value"><%= dashboardStats.currentlyIssued || 0 %></strong><small>Book titles being borrowed</small></div>
+                <div class="librarian-stat"><span class="librarian-stat-label">Overdue Books</span><strong class="librarian-stat-value"><%= dashboardStats.overdueBooks %></strong></div>
+                <div class="librarian-stat"><span class="librarian-stat-label">Registered Students</span><strong class="librarian-stat-value"><%= dashboardStats.registeredStudents %></strong></div>
+            </div>
+        </section>
+
+        <section class="librarian-module-section action-required-panel" aria-labelledby="action-required-title">
+            <div class="librarian-module-heading"><div><h2 class="librarian-section-title" id="action-required-title">Action Required</h2><p>Items that need attention from the library desk.</p></div></div>
+            <div class="librarian-stats">
+                <a class="librarian-stat" href="#requests"><span class="librarian-stat-label">Pending Book Requests</span><strong class="librarian-stat-value"><%= dashboardStats.pendingRequests || 0 %></strong></a>
+                <a class="librarian-stat" href="#issue-returns"><span class="librarian-stat-label">Overdue Books</span><strong class="librarian-stat-value"><%= dashboardStats.overdueBooks || 0 %></strong></a>
+                <a class="librarian-stat" href="#fines"><span class="librarian-stat-label">Outstanding Fines</span><strong class="librarian-stat-value"><%= dashboardStats.outstandingFineRecords || 0 %></strong></a>
+                <a class="librarian-stat" href="#requests"><span class="librarian-stat-label">Approved Waiting for Issue</span><strong class="librarian-stat-value"><%= dashboardStats.approvedRequests || 0 %></strong></a>
+            </div>
+        </section>
+
+        <div class="librarian-management-grid">
+        <section class="librarian-feature-panel" aria-label="Library management focus">
+            <div class="librarian-feature-copy">
+                <span class="librarian-eyebrow">The librarian's desk</span>
+                <h2>Manage.<br><em>Organize.</em><br>Empower.</h2>
+                <p>A considered library is more than shelves. It is a place where every reader finds their next beginning.</p>
+            </div>
+            <div class="librarian-feature-scene" aria-hidden="true">
+                <span class="feature-lamp lamp-one"></span>
+                <span class="feature-lamp lamp-two"></span>
+                <span class="feature-shelf shelf-one"></span>
+                <span class="feature-shelf shelf-two"></span>
+                <span class="feature-plant">❧</span>
+            </div>
+        </section>
+
+        <section aria-labelledby="actions-title">
+            <h2 class="librarian-section-title" id="actions-title">Quick Actions</h2>
+            <div class="librarian-actions">
+                <a class="librarian-action" href="#add-book"><strong>Add New Book</strong><span>Add a physical library book</span></a>
+                <a class="librarian-action" href="/librarian/books"><strong>View Books</strong><span>Browse the library catalogue</span></a>
+                <a class="librarian-action" href="/register"><strong>Register Student</strong><span>Create a student account</span></a>
+                <a class="librarian-action" href="#issue-returns"><strong>Issue Book</strong><span>Issue or return a book</span></a>
+                <a class="librarian-action" href="#qr-management"><strong>Generate QR</strong><span>Create a scannable book code</span></a>
+            </div>
+        </section>
+        </div>
+
+        <div class="librarian-lower-grid">
+            <section class="librarian-info-panel" aria-labelledby="activity-title">
+                <div class="librarian-panel-heading"><h2 id="activity-title">Recent Activities</h2><span>Today</span></div>
+                <% if (report.recentActivities && report.recentActivities.length) { %>
+                    <div class="librarian-activity-list">
+                        <% report.recentActivities.forEach(activity => { %>
+                            <div class="librarian-activity-item">
+                                <span class="librarian-activity-dot"></span>
+                                <div><strong><%= activity.type %></strong><span><%= activity.text %></span></div>
+                                <time><%= new Date(activity.date).toLocaleDateString('en-IN') %></time>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } else { %>
+                    <div class="librarian-empty-state"><span>◌</span><strong>No recent activity yet.</strong><small>Library activity will appear here as it happens.</small></div>
+                <% } %>
+            </section>
+            <section class="librarian-info-panel" aria-labelledby="announcement-title">
+                <div class="librarian-panel-heading"><h2 id="announcement-title">Announcements</h2><span>Updates</span></div>
+                <div class="librarian-empty-state"><span>✦</span><strong>No announcements yet.</strong><small>Important library notices will appear here.</small></div>
+            </section>
+        </div>
+
+
+        <% if (moduleSuccess) { %>
+            <div class="librarian-alert librarian-alert-success"><%= moduleSuccess %></div>
+        <% } %>
+        <% if (moduleError) { %>
+            <div class="librarian-alert librarian-alert-error"><%= moduleError %></div>
+        <% } %>
+
+        <!-- Students Management -->
+        <section class="librarian-module-section" id="students" aria-labelledby="students-title">
+            <div class="librarian-module-heading">
+                <div><h2 class="librarian-section-title" id="students-title">Students</h2><p>Manage registered student accounts and see their lending status.</p></div>
+                <a class="librarian-submit" href="/register">Register Student</a>
+            </div>
+            <form class="librarian-module-filter" method="GET" action="/librarian#students">
+                <input class="form-input" type="search" name="studentSearch" value="<%= studentSearch %>" placeholder="Search student name or email">
+                <button class="librarian-submit" type="submit">Search</button>
+                <% if (studentSearch) { %><a class="librarian-cancel-link" href="/librarian#students">Clear</a><% } %>
+            </form>
+            <% if (students.length) { %>
+                <div class="librarian-table-wrap"><table class="librarian-module-table"><thead><tr><th>Student</th><th>Email</th><th>Joined</th><th>Status</th><th>Action</th></tr></thead><tbody>
+                    <% students.forEach(student => { %>
+                        <tr>
+                            <td><strong><%= student.name %></strong></td>
+                            <td><%= student.email %></td>
+                            <td><%= student.createdAt ? new Date(student.createdAt).toLocaleDateString('en-IN') : '-' %></td>
+                            <td><span class="librarian-status-pill <%= student.isActive === false ? 'is-danger' : 'is-success' %>"><%= student.isActive === false ? 'Inactive' : 'Active' %></span></td>
+                            <td><form method="POST" action="/librarian/students/<%= student._id %>/toggle"><button class="librarian-small-button" type="submit"><%= student.isActive === false ? 'Activate' : 'Deactivate' %></button></form></td>
+                        </tr>
+                    <% }); %>
+                </tbody></table></div>
+            <% } else { %><div class="librarian-empty-books">No students found.</div><% } %>
+        </section>
+
+        <!-- Issue & Returns -->
+        <section class="librarian-module-section" id="issue-returns" aria-labelledby="issue-title">
+            <div class="librarian-module-heading"><div><h2 class="librarian-section-title" id="issue-title">Issue &amp; Returns</h2><p>Issue a book to a student or process an active return. Borrowing period: 14 days.</p></div></div>
+            <div class="librarian-two-column">
+                <form class="librarian-module-form" method="POST" action="/librarian/lending/issue">
+                    <h3>Issue Book</h3>
+                    <label class="form-label" for="issue-student-id">Student <span class="required">*</span></label>
+                    <select class="form-input" id="issue-student-id" name="studentId" required>
+                        <option value="">Select student</option>
+                        <% students.forEach(student => { %><option value="<%= student._id %>"><%= student.name %> — <%= student.email %></option><% }); %>
+                    </select>
+                    <label class="form-label" for="issue-book-id">Book <span class="required">*</span></label>
+                    <select class="form-input" id="issue-book-id" name="bookId" required>
+                        <option value="">Select available book</option>
+                        <% qrBooks.forEach(book => { if ((book.availableCopies || 0) > 0) { %><option value="<%= book._id %>"><%= book.title %> — <%= book.author %></option><% } }) %>
+                    </select>
+                    <button class="librarian-submit" type="submit">Issue Book</button>
+                </form>
+                <div class="librarian-module-form">
+                    <h3>Active Loans</h3>
+                    <% if (activeLoans.length) { %>
+                        <div class="librarian-scroll-list">
+                        <% activeLoans.forEach(loan => { const late = new Date(loan.dueDate) < new Date(); const suggestedFine = calculateLateFine(loan.dueDate).fine; const overdueDays = late ? Math.max(0, Math.floor((new Date().setHours(0, 0, 0, 0) - new Date(loan.dueDate).setHours(0, 0, 0, 0)) / 86400000)) : 0; %>
+                            <div class="librarian-loan-item">
+                                <div><strong><%= loan.book?.title || 'Book unavailable' %></strong><span><%= loan.student?.name || 'Student' %> · <%= loan.student?.email || '' %></span><small>Issued: <%= new Date(loan.issueDate).toLocaleDateString('en-IN') %> · Due: <%= new Date(loan.dueDate).toLocaleDateString('en-IN') %> · <%= late ? 'Overdue' : 'Active' %></small><small>Overdue days: <%= overdueDays %> · Suggested fine: ₹<%= suggestedFine %></small></div>
+                                <div class="librarian-inline-actions">
+                                    <form method="POST" action="/librarian/lending/return"><input type="hidden" name="loanId" value="<%= loan._id %>"><select class="librarian-mini-select" name="fineType" aria-label="Fine type"><option value="none">No Fine</option><option value="late" <%= suggestedFine > 0 ? 'selected' : '' %>>Late Return</option><option value="other">Other</option></select><label class="fine-input-label">Final Fine ₹<input class="librarian-fine-input" type="number" name="finalFine" min="0" step="0.01" value="<%= suggestedFine %>" required></label><button class="librarian-small-button" type="submit">Return</button></form>
+                                    <form method="POST" action="/librarian/mark-lost" onsubmit="return confirm('Mark this book as lost?');"><input type="hidden" name="loanId" value="<%= loan._id %>"><input class="librarian-fine-input" type="number" name="finalFine" min="0" step="0.01" placeholder="Lost fine"><button class="librarian-danger-button" type="submit">Lost</button></form>
+                                    <form method="POST" action="/librarian/mark-damaged"><input type="hidden" name="loanId" value="<%= loan._id %>"><select class="librarian-mini-select" name="damageLevel" aria-label="Damage level"><option value="MINOR">Minor</option><option value="MODERATE">Moderate</option><option value="SEVERE">Severe</option></select><input class="librarian-fine-input" type="number" name="finalFine" min="0" step="0.01" placeholder="Damage fine"><button class="librarian-small-button" type="submit">Damaged</button></form>
+                                </div>
+                            </div>
+                        <% }); %>
+                        </div>
+                    <% } else { %><div class="librarian-empty-books">No active loans.</div><% } %>
+                </div>
+            </div>
+        </section>
+
+        <!-- Book Requests -->
+        <section class="librarian-module-section" id="requests" aria-labelledby="requests-title">
+            <div class="librarian-module-heading"><div><h2 class="librarian-section-title" id="requests-title">Book Requests</h2><p>Review titles requested by students.</p></div><strong class="librarian-module-count"><%= dashboardStats.pendingRequests %> pending</strong></div>
+            <% const requestMap = new Map([...(pendingRequests || []), ...(requestHistory || [])].map(request => [String(request._id), request])); %>
+            <% const requestsToShow = Array.from(requestMap.values()); %>
+            <% if (requestsToShow.length) { %>
+                <div class="librarian-request-grid"><% requestsToShow.forEach(request => { %>
+                    <article class="librarian-request-card"><div><span class="librarian-status-pill <%= request.status === 'pending' ? 'is-warning' : request.status === 'approved' ? 'is-success' : request.status === 'issued' ? 'is-success' : 'is-danger' %>"><%= request.status.toUpperCase() %></span><h3><%= request.title %></h3><p><%= request.author || 'Author not specified' %> · Availability: <%= request.book?.availableCopies ?? 'Not in catalogue' %> copies</p><small><%= request.student?.name || request.studentName || 'Student' %> · <%= request.student?.email || '' %></small><small>Requested: <%= request.requestDate ? new Date(request.requestDate).toLocaleDateString('en-IN') : 'Unknown' %></small><% if (request.message) { %><blockquote><%= request.message %></blockquote><% } %></div><div class="librarian-inline-actions"><% if (request.status === 'pending') { %><form method="POST" action="/librarian/requests/<%= request._id %>/approve"><button class="librarian-small-button" type="submit">Approve</button></form><form method="POST" action="/librarian/requests/<%= request._id %>/reject"><button class="librarian-danger-button" type="submit">Reject</button></form><% } else if (request.status === 'approved' && request.book && request.student) { %><form method="POST" action="/librarian/lending/issue"><input type="hidden" name="requestId" value="<%= request._id %>"><input type="hidden" name="studentId" value="<%= request.student._id %>"><input type="hidden" name="bookId" value="<%= request.book._id %>"><button class="librarian-small-button" type="submit">Issue Book</button></form><% } else if (request.status === 'issued') { %><span class="librarian-status-pill is-success">Issued</span><% } %></div></article>
+                <% }); %></div>
+            <% } else { %><div class="librarian-empty-books">No pending or approved requests.</div><% } %>
+        </section>
+
+        <!-- Fines -->
+        <section class="librarian-module-section" id="fines" aria-labelledby="fines-title">
+            <div class="librarian-module-heading"><div><h2 class="librarian-section-title" id="fines-title">Fines</h2><p>Current late, lost and damaged-book charges.</p></div><strong class="librarian-fine-total">Outstanding: ₹<%= dashboardStats.outstandingFines %></strong></div>
+            <% if (fineRecords.length) { %>
+                <div class="librarian-table-wrap"><table class="librarian-module-table"><thead><tr><th>Student</th><th>Book</th><th>Fine Type</th><th>Issue / Due / Return</th><th>Final Fine</th></tr></thead><tbody>
+                    <% fineRecords.forEach(record => { const fine = calculateCurrentFine(record); %>
+                        <tr><td><strong><%= record.student?.name || 'Student' %></strong><small><%= record.student?.email || '' %></small></td><td><%= record.book?.title || 'Book unavailable' %></td><td><span class="librarian-status-pill <%= record.status === 'issued' ? 'is-warning' : record.status === 'returned' ? 'is-success' : 'is-danger' %>"><%= record.fineType || (record.status === 'issued' ? 'late' : record.status) %></span></td><td><small>Issued: <%= record.issueDate ? new Date(record.issueDate).toLocaleDateString('en-IN') : '-' %></small><small>Due: <%= record.dueDate ? new Date(record.dueDate).toLocaleDateString('en-IN') : '-' %></small><small>Returned: <%= record.returnDate ? new Date(record.returnDate).toLocaleDateString('en-IN') : '-' %></small></td><td><% if (record.status === 'issued') { %><strong>Not finalized</strong><small>Suggested: ₹<%= fine %></small><% } else { %><strong>₹<%= fine %></strong><% } %><% if (record.suggestedFine !== null && record.suggestedFine !== undefined && record.status !== 'issued') { %><small>Suggested: ₹<%= record.suggestedFine %></small><% } %></td></tr>
+                    <% }); %>
+                </tbody></table></div>
+            <% } else { %><div class="librarian-empty-books">No fines or overdue charges recorded.</div><% } %>
+        </section>
+
+        <!-- Reports -->
+        <section class="librarian-module-section" id="reports" aria-labelledby="reports-title">
+            <div class="librarian-module-heading"><div><h2 class="librarian-section-title" id="reports-title">Reports</h2><p>Inventory and circulation summary generated from MongoDB records.</p></div></div>
+            <div class="librarian-report-grid">
+                <div class="librarian-report-card"><h3>Inventory by Category</h3><% report.categories.forEach(item => { %><div class="librarian-report-row"><span><%= item._id || 'Uncategorised' %></span><strong><%= item.copies %> copies</strong><small><%= item.available %> available · <%= item.titles %> titles</small></div><% }); %></div>
+                <div class="librarian-report-card"><h3>Circulation</h3><% report.circulation.forEach(item => { %><div class="librarian-report-row"><span><%= item._id %></span><strong><%= item.count %></strong></div><% }); %><% if (!report.circulation.length) { %><div class="librarian-empty-books">No circulation records yet.</div><% } %></div>
+                <div class="librarian-report-card"><h3>Most Borrowed Books</h3><% report.topBooks.forEach((item, index) => { %><div class="librarian-report-row"><span>#<%= index + 1 %> <%= item.title || 'Deleted book' %></span><strong><%= item.borrowCount %> borrows</strong><small><%= item.author || '' %></small></div><% }); %><% if (!report.topBooks.length) { %><div class="librarian-empty-books">No borrowing data yet.</div><% } %></div>
+            </div>
+        </section>
+
+        <!-- QR Management -->
+        <section class="librarian-module-section" id="qr-management" aria-labelledby="qr-title">
+            <div class="librarian-module-heading"><div><h2 class="librarian-section-title" id="qr-title">QR Management</h2><p>Select a book to generate a printable QR code containing its catalogue details.</p></div></div>
+            <form class="librarian-module-filter" method="GET" action="/librarian#qr-management">
+                <select class="form-input" name="qrBook" required><option value="">Select a book</option><% qrBooks.forEach(book => { %><option value="<%= book._id %>" <%= selectedQrBook && String(selectedQrBook._id) === String(book._id) ? 'selected' : '' %>><%= book.title %> — <%= book.author %></option><% }); %></select>
+                <button class="librarian-submit" type="submit">Generate QR</button>
+            </form>
+            <% if (selectedQrBook) { %>
+                <% const qrText = `Library Book | ${selectedQrBook.title} | Author: ${selectedQrBook.author} | ISBN: ${selectedQrBook.isbn || 'N/A'} | Location: ${[selectedQrBook.location?.building, selectedQrBook.location?.floor, selectedQrBook.location?.shelf].filter(Boolean).join(', ') || 'Not specified'}`; %>
+                <div class="librarian-qr-card"><img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=<%= encodeURIComponent(qrText) %>" alt="QR code for <%= selectedQrBook.title %>"><div><h3><%= selectedQrBook.title %></h3><p><strong>Author:</strong> <%= selectedQrBook.author %></p><p><strong>ISBN:</strong> <%= selectedQrBook.isbn || 'N/A' %></p><p><strong>Location:</strong> <%= [selectedQrBook.location?.building, selectedQrBook.location?.floor, selectedQrBook.location?.shelf].filter(Boolean).join(' · ') || 'Not specified' %></p><button class="librarian-submit" type="button" onclick="window.print()">Print QR</button></div></div>
+            <% } %>
+        </section>
+
+        <!-- Settings -->
+        <section class="librarian-module-section" id="settings" aria-labelledby="settings-title">
+            <div class="librarian-module-heading"><div><h2 class="librarian-section-title" id="settings-title">Settings</h2><p>Manage your librarian account.</p></div></div>
+            <% if (settingsMessage) { %><div class="librarian-alert librarian-alert-success"><%= settingsMessage %></div><% } %>
+            <div class="librarian-two-column">
+                <div class="librarian-module-form"><h3>Account</h3><p><strong>Name:</strong> <%= librarian.name %></p><p><strong>Role:</strong> Librarian</p><p>Authentication uses a signed JWT stored in an HTTP-only cookie.</p></div>
+                <form class="librarian-module-form" method="POST" action="/librarian/settings/password"><h3>Change Password</h3><label class="form-label">Current Password <span class="required">*</span></label><input class="form-input" type="password" name="currentPassword" required><label class="form-label">New Password <span class="required">*</span></label><input class="form-input" type="password" name="newPassword" minlength="6" required><label class="form-label">Confirm New Password <span class="required">*</span></label><input class="form-input" type="password" name="confirmPassword" minlength="6" required><button class="librarian-submit" type="submit">Update Password</button></form>
+            </div>
+        </section>
+
+        <% if (booksPage) { %>
+            <section class="librarian-books-section" id="books" aria-labelledby="books-title">
+                <div class="librarian-books-heading">
+                    <div>
+                        <h2 class="librarian-section-title" id="books-title">Library Books</h2>
+                        <p class="librarian-books-count"><%= bookPagination.total %> book<%= bookPagination.total === 1 ? '' : 's' %> in the library</p>
+                    </div>
+                    <a class="librarian-submit librarian-inline-link" href="#add-book">Add New Book</a>
+                </div>
+
+                <form class="librarian-book-filters" method="GET" action="/librarian/books">
+                    <input class="form-input" type="search" name="search" value="<%= bookFilters.search %>" placeholder="Search title, author, ISBN, category">
+                    <select class="form-input" name="category">
+                        <option value="">All categories</option>
+                        <% bookCategories.forEach(category => { %>
+                            <option value="<%= category %>" <%= bookFilters.category === category ? 'selected' : '' %>><%= category %></option>
+                        <% }); %>
+                    </select>
+                    <select class="form-input" name="availability">
+                        <option value="all" <%= bookFilters.availability === 'all' ? 'selected' : '' %>>All availability</option>
+                        <option value="available" <%= bookFilters.availability === 'available' ? 'selected' : '' %>>Available</option>
+                        <option value="out" <%= bookFilters.availability === 'out' ? 'selected' : '' %>>Out of Stock</option>
+                    </select>
+                    <select class="form-input" name="sort">
+                        <option value="newest" <%= bookFilters.sort === 'newest' ? 'selected' : '' %>>Newest Added</option>
+                        <option value="oldest" <%= bookFilters.sort === 'oldest' ? 'selected' : '' %>>Oldest Added</option>
+                        <option value="titleAsc" <%= bookFilters.sort === 'titleAsc' ? 'selected' : '' %>>Title A-Z</option>
+                        <option value="titleDesc" <%= bookFilters.sort === 'titleDesc' ? 'selected' : '' %>>Title Z-A</option>
+                    </select>
+                    <button class="librarian-submit" type="submit">Apply</button>
+                </form>
+
+                <% if (books.length) { %>
+                    <div class="librarian-book-table-wrap">
+                        <table class="librarian-book-table">
+                            <thead>
+                                <tr>
+                                    <th>Book</th>
+                                    <th>Author</th>
+                                    <th>Category</th>
+                                    <th>Value</th>
+                                    <th>Copies</th>
+                                    <th>Location</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% books.forEach(book => { %>
+                                    <tr>
+                                        <td>
+                                            <div class="librarian-book-identity">
+                                                <% if (book.image) { %>
+                                                    <img src="<%= book.image %>" alt="<%= book.title %>" loading="lazy">
+                                                <% } else { %>
+                                                    <span class="librarian-book-placeholder">📖</span>
+                                                <% } %>
+                                                <div>
+                                                    <strong><%= book.title %></strong>
+                                                    <span><%= book.isbn || 'ISBN not specified' %></span>
+                                                    <% if (book.publisher || book.edition || book.language) { %>
+                                                        <small><%= [book.publisher, book.edition, book.language].filter(Boolean).join(' · ') %></small>
+                                                    <% } %>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><%= book.author %></td>
+                                        <td><%= book.category %></td>
+                                        <td><%= book.bookValue === null || book.bookValue === undefined ? '-' : '₹' + book.bookValue %></td>
+                                        <td>
+                                            <strong><%= book.availableCopies %> / <%= book.totalCopies %></strong>
+                                            <span class="librarian-availability <%= book.availableCopies > 0 ? 'is-available' : 'is-out' %>"><%= book.currentStatus %></span>
+                                            <small>Issued: <%= book.issuedCopies %></small>
+                                        </td>
+                                        <td><%= [book.location && book.location.building, book.location && book.location.floor, book.location && book.location.shelf].filter(Boolean).join(' · ') || '-' %></td>
+                                        <td>
+                                            <div class="librarian-book-actions">
+                                                <a class="librarian-action-link" href="/librarian/books?edit=<%= book._id %>#edit-book">Edit</a>
+                                                <form action="/librarian/books/<%= book._id %>/delete" method="POST" onsubmit="return confirm('Delete this book? This action cannot be undone.');">
+                                                    <button class="librarian-delete-button" type="submit">Delete</button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            </tbody>
+                        </table>
+                    </div>
+                    <% if (bookPagination.totalPages > 1) { %>
+                        <div class="librarian-pagination">
+                            <% if (bookPagination.page > 1) { %>
+                                <a href="/librarian/books?page=<%= bookPagination.page - 1 %>&search=<%= encodeURIComponent(bookFilters.search) %>&category=<%= encodeURIComponent(bookFilters.category) %>&availability=<%= bookFilters.availability %>&sort=<%= bookFilters.sort %>">Previous</a>
+                            <% } %>
+                            <span>Page <%= bookPagination.page %> of <%= bookPagination.totalPages %></span>
+                            <% if (bookPagination.page < bookPagination.totalPages) { %>
+                                <a href="/librarian/books?page=<%= bookPagination.page + 1 %>&search=<%= encodeURIComponent(bookFilters.search) %>&category=<%= encodeURIComponent(bookFilters.category) %>&availability=<%= bookFilters.availability %>&sort=<%= bookFilters.sort %>">Next</a>
+                            <% } %>
+                        </div>
+                    <% } %>
+                <% } else { %>
+                    <div class="librarian-empty-books"><%= bookFilters.search || bookFilters.category || bookFilters.availability !== 'all' ? 'No books found matching your search.' : 'No books have been added yet.' %></div>
+                <% } %>
+            </section>
+        <% } %>
+
+        <section class="librarian-form-section" id="<%= editBook ? 'edit-book' : 'add-book' %>" aria-labelledby="<%= editBook ? 'edit-book-title' : 'add-book-title' %>">
+            <h2 class="librarian-section-title" id="<%= editBook ? 'edit-book-title' : 'add-book-title' %>"><%= editBook ? 'Edit Book' : 'Add New Book' %></h2>
+            <form class="librarian-book-form" action="<%= editBook ? '/librarian/books/' + editBook._id + '/edit' : '/librarian/books' %>" method="POST">
+                <div class="librarian-form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="title">Title <span class="required">*</span></label>
+                        <input class="form-input" id="title" name="title" value="<%= formData.title || '' %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="author">Author <span class="required">*</span></label>
+                        <input class="form-input" id="author" name="author" value="<%= formData.author || '' %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="category">Category <span class="required">*</span></label>
+                        <input class="form-input" id="category" name="category" value="<%= formData.category || '' %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="bookValue">Book Value <span class="required">*</span></label>
+                        <input class="form-input" id="bookValue" name="bookValue" type="number" min="0" step="0.01" value="<%= formData.bookValue || '' %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="totalCopies">Total Copies <span class="required">*</span></label>
+                        <input class="form-input" id="totalCopies" name="totalCopies" type="number" min="1" step="1" value="<%= formData.totalCopies || '' %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="isbn">ISBN</label>
+                        <input class="form-input" id="isbn" name="isbn" value="<%= formData.isbn || '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="image">Image URL</label>
+                        <input class="form-input" id="image" name="image" type="url" value="<%= formData.image || '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="publisher">Publisher</label>
+                        <input class="form-input" id="publisher" name="publisher" value="<%= formData.publisher || '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="edition">Edition</label>
+                        <input class="form-input" id="edition" name="edition" value="<%= formData.edition || '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="language">Language</label>
+                        <input class="form-input" id="language" name="language" value="<%= formData.language || '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="building">Building</label>
+                        <input class="form-input" id="building" name="building" value="<%= formData.building || '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="floor">Floor</label>
+                        <input class="form-input" id="floor" name="floor" value="<%= formData.floor || '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="shelf">Shelf</label>
+                        <input class="form-input" id="shelf" name="shelf" value="<%= formData.shelf || '' %>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea class="form-input librarian-description" id="description" name="description" rows="4"><%= formData.description || '' %></textarea>
+                </div>
+                <div class="librarian-form-actions">
+                    <button class="librarian-submit" type="submit"><%= editBook ? 'Update Book' : 'Add Book' %></button>
+                    <% if (editBook) { %>
+                        <a class="librarian-cancel-link" href="/librarian/books">Cancel Edit</a>
+                    <% } %>
+                </div>
+            </form>
+        </section>
+            </div>
+            <footer class="librarian-footer">BookNest <span>© 2026</span> | Library Management System <strong>“Good libraries build great futures.”</strong></footer>
+        </main>
+    </div>
+</body>
+</html>

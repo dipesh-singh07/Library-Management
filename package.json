@@ -1,0 +1,30 @@
+{
+  "name": "library-management",
+  "version": "1.0.0",
+  "description": "Full Library Management & Book Lending System with student and librarian portals, authentication, lending, fines, requests, reports and QR management.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "seed": "node seeds/seedBooks.js"
+  },
+  "keywords": [
+    "library",
+    "authentication",
+    "express",
+    "jwt",
+    "mongoose"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.6.1",
+    "ejs": "^3.1.10",
+    "express": "^4.22.3",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^8.24.4"
+  },
+  "type": "commonjs"
+}

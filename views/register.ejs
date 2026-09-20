@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Library Management System</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="brand">📚 <span>Library</span>System</a>
+        <div class="nav-links">
+            <a href="/" class="nav-link">Home</a>
+            <a href="/login" class="nav-link">Login</a>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">📖</div>
+                <h1 class="card-title">Create Account</h1>
+                <p class="card-subtitle">Join the Library Management System</p>
+            </div>
+
+            <% if (error) { %>
+                <div class="alert-error">
+                    <span>⚠️</span>
+                    <span><%= error %></span>
+                </div>
+            <% } %>
+
+            <form action="/register" method="POST" id="registerForm">
+                <!-- Name -->
+                <div class="form-group">
+                    <label class="form-label" for="name">Full Name <span class="required">*</span></label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        class="form-input" 
+                        placeholder="John Doe" 
+                        value="<%= typeof formData !== 'undefined' && formData.name ? formData.name : '' %>" 
+                        required
+                    >
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address <span class="required">*</span></label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="form-input" 
+                        placeholder="john@example.com" 
+                        value="<%= typeof formData !== 'undefined' && formData.email ? formData.email : '' %>" 
+                        required
+                    >
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label class="form-label" for="password">Password <span class="required">*</span></label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="form-input" 
+                        placeholder="••••••••" 
+                        required
+                    >
+                </div>
+
+                <!-- Account Type Selector -->
+                <div class="form-group">
+                    <label class="form-label">Account Type</label>
+                    <div class="account-type-group">
+                        <label class="role-radio-label <%= (typeof formData !== 'undefined' && formData.accountType === 'student') || typeof formData === 'undefined' || !formData.accountType ? 'active' : '' %>" id="labelStudent">
+                            <input 
+                                type="radio" 
+                                name="accountType" 
+                                value="student" 
+                                <%= (typeof formData !== 'undefined' && formData.accountType === 'student') || typeof formData === 'undefined' || !formData.accountType ? 'checked' : '' %>
+                            >
+                            Student
+                        </label>
+                        <label class="role-radio-label <%= (typeof formData !== 'undefined' && formData.accountType === 'librarian') ? 'active' : '' %>" id="labelLibrarian">
+                            <input 
+                                type="radio" 
+                                name="accountType" 
+                                value="librarian"
+                                <%= (typeof formData !== 'undefined' && formData.accountType === 'librarian') ? 'checked' : '' %>
+                            >
+                            Librarian
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Librarian Key (Visible only when Librarian is selected) -->
+                <div class="form-group conditional-field" id="librarianKeyGroup" style="display: none;">
+                    <label class="form-label" for="librarianKey">Librarian Secret Key <span class="required">*</span></label>
+                    <input 
+                        type="password" 
+                        id="librarianKey" 
+                        name="librarianKey" 
+                        class="form-input" 
+                        placeholder="Enter the secret librarian key"
+                    >
+                    <small class="key-hint">Verification key provided by library administration.</small>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-submit">Register</button>
+            </form>
+
+            <div class="card-footer">
+                Already have an account? <a href="/login">Login here</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client-side UI toggling for Librarian Key field -->
+    <script>
+        const studentRadio = document.querySelector('input[value="student"]');
+        const librarianRadio = document.querySelector('input[value="librarian"]');
+        const librarianKeyGroup = document.getElementById('librarianKeyGroup');
+        const librarianKeyInput = document.getElementById('librarianKey');
+        const labelStudent = document.getElementById('labelStudent');
+        const labelLibrarian = document.getElementById('labelLibrarian');
+
+        function updateRoleView() {
+            if (librarianRadio.checked) {
+                librarianKeyGroup.style.display = 'block';
+                librarianKeyInput.setAttribute('required', 'required');
+                labelLibrarian.classList.add('active');
+                labelStudent.classList.remove('active');
+            } else {
+                librarianKeyGroup.style.display = 'none';
+                librarianKeyInput.removeAttribute('required');
+                librarianKeyInput.value = '';
+                labelStudent.classList.add('active');
+                labelLibrarian.classList.remove('active');
+            }
+        }
+
+        studentRadio.addEventListener('change', updateRoleView);
+        librarianRadio.addEventListener('change', updateRoleView);
+
+        // Run on initial load
+        updateRoleView();
+    </script>
+</body>
+</html>

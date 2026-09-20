@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="/" class="brand">📚 <span>Library</span>System</a>
+        <div class="nav-links">
+            <% if (user) { %>
+                <a href="/logout" class="nav-link">Logout</a>
+            <% } else { %>
+                <a href="/login" class="nav-link">Login</a>
+                <a href="/register" class="nav-link btn-nav">Register</a>
+            <% } %>
+        </div>
+    </nav>
+
+    <div class="main-wrapper">
+        <div class="card card-wide">
+            <% if (!user) { %>
+                <!-- Unauthenticated View -->
+                <div class="card-header">
+                    <div class="card-icon">🏛️</div>
+                    <h1 class="card-title">Welcome to Library Management System</h1>
+                    <p class="card-subtitle">Secure Book Lending & Library Portal</p>
+                </div>
+
+                <p style="text-align: center; color: #cbd5e1; margin-bottom: 2rem; line-height: 1.6;">
+                    Please login with your credentials or register a new student or librarian account to continue.
+                </p>
+
+                <div class="action-buttons">
+                    <a href="/login" class="btn-primary">Login</a>
+                    <a href="/register" class="btn-secondary">Register</a>
+                </div>
+
+            <% } else { %>
+                <!-- Authenticated View -->
+                <div class="card-header">
+                    <div class="card-icon"><%= user.role === 'librarian' ? '🧙‍♂️' : '🎓' %></div>
+                    <h1 class="card-title">Welcome, <%= user.name %></h1>
+                    <p class="card-subtitle">Authentication Successful</p>
+                </div>
+
+                <div class="user-info-box">
+                    <div class="user-greeting">
+                        Account Role: 
+                        <span class="role-badge <%= user.role === 'librarian' ? 'role-librarian' : 'role-student' %>">
+                            <%= user.role === 'librarian' ? 'Librarian' : 'Student' %>
+                        </span>
+                    </div>
+                    <p style="color: #94a3b8; font-size: 0.9rem;">
+                        Authentication powered by JWT stored in an HTTP-only cookie.
+                    </p>
+                </div>
+
+                <div class="action-buttons">
+                    <a href="/logout" class="btn-danger">Logout</a>
+                </div>
+
+                <!-- Test Authorization Routes Section -->
+                <div class="test-routes-section">
+                    <p class="test-routes-title">Test Role-Based Authorization</p>
+                    <% if (user.role === 'librarian') { %>
+                        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 0.75rem;">
+                            As a <strong>Librarian</strong>, you are authorized to access the librarian test route:
+                        </p>
+                        <a href="/librarian" class="test-link">Go to /librarian (Authorized)</a>
+                        <div style="margin-top: 0.75rem;">
+                            <a href="/student" class="test-link" style="color: #94a3b8; font-size: 0.85rem;">Test /student (Expect 403 Forbidden)</a>
+                        </div>
+                    <% } else if (user.role === 'student') { %>
+                        <p style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 0.75rem;">
+                            As a <strong>Student</strong>, you are authorized to access the student test route:
+                        </p>
+                        <a href="/student" class="test-link">Go to /student (Authorized)</a>
+                        <div style="margin-top: 0.75rem;">
+                            <a href="/librarian" class="test-link" style="color: #94a3b8; font-size: 0.85rem;">Test /librarian (Expect 403 Forbidden)</a>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+    </div>
+
+</body>
+</html>

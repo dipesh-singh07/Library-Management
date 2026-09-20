@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Catalogue | Library Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/student.css">
+</head>
+<body class="student-page-body catalogue-page-body">
+    <main class="catalogue-page-shell">
+        <header class="catalogue-page-header">
+            <div>
+                <a class="catalogue-back-link" href="/student">Back to dashboard</a>
+                <h1>Library Catalogue</h1>
+                <p>Browse all books available in the library.</p>
+            </div>
+            <div class="catalogue-student-name"><%= student.name %></div>
+        </header>
+
+        <form class="catalogue-filters" method="GET" action="/student/books">
+            <label class="catalogue-search-field">
+                <span>Search books</span>
+                <input type="search" name="search" value="<%= filters.search %>" placeholder="Title, author, category, or ISBN">
+            </label>
+            <label>
+                <span>Category</span>
+                <select name="category">
+                    <option value="">All categories</option>
+                    <% categories.forEach(category => { %>
+                        <option value="<%= category %>" <%= filters.category === category ? 'selected' : '' %>><%= category %></option>
+                    <% }); %>
+                </select>
+            </label>
+            <label>
+                <span>Availability</span>
+                <select name="availability">
+                    <option value="all" <%= filters.availability === 'all' ? 'selected' : '' %>>All</option>
+                    <option value="available" <%= filters.availability === 'available' ? 'selected' : '' %>>Available</option>
+                    <option value="unavailable" <%= filters.availability === 'unavailable' ? 'selected' : '' %>>Currently Unavailable</option>
+                </select>
+            </label>
+            <label>
+                <span>Sort by</span>
+                <select name="sort">
+                    <option value="titleAsc" <%= filters.sort === 'titleAsc' ? 'selected' : '' %>>Title A-Z</option>
+                    <option value="titleDesc" <%= filters.sort === 'titleDesc' ? 'selected' : '' %>>Title Z-A</option>
+                    <option value="newest" <%= filters.sort === 'newest' ? 'selected' : '' %>>Newest added</option>
+                </select>
+            </label>
+            <button class="catalogue-filter-button" type="submit">Search</button>
+        </form>
+
+        <% if (books.length) { %>
+            <section class="catalogue-results" aria-label="Library books">
+                <% books.forEach(book => { %>
+                    <article class="catalogue-book-row">
+                        <div class="catalogue-book-cover">
+                            <% if (book.image) { %>
+                                <img src="<%= book.image %>" alt="<%= book.title %>" loading="lazy">
+                            <% } else { %>
+                                <span>BOOK</span>
+                            <% } %>
+                        </div>
+                        <div class="catalogue-book-main">
+                            <div class="catalogue-book-heading">
+                                <div>
+                                    <h2><%= book.title %></h2>
+                                    <p>By <%= book.author %></p>
+                                </div>
+                                <span class="catalogue-status status-<%= book.status %>"><%= book.statusLabel %></span>
+                            </div>
+                            <div class="catalogue-book-meta">
+                                <span>Category: <strong><%= book.category %></strong></span>
+                                <% if (book.isbn) { %><span>ISBN: <strong><%= book.isbn %></strong></span><% } %>
+                                <span>Total: <strong><%= book.totalCopies %></strong></span>
+                                <span>Available: <strong><%= book.availableCopies %></strong></span>
+                                <span>Issued: <strong><%= book.issuedCopies %></strong></span>
+                            </div>
+                            <div class="catalogue-book-footer">
+                                <span><strong>Location:</strong> <%= [book.location?.building, book.location?.floor, book.location?.shelf].filter(Boolean).join(' · ') || 'Not specified' %></span>
+                                <% if (book.status === 'issued' || book.status === 'overdue' || book.status === 'unavailable') { %><span>Expected availability: <%= book.expectedAvailability %></span><% } %>
+                            </div>
+                        </div>
+                        <div class="catalogue-book-actions">
+                            <a class="catalogue-secondary-button" href="/student/books/<%= book._id %>">View Details</a>
+                            <% if (book.status === 'available' && !book.hasActiveRequest) { %>
+                                <form action="/student/request-book" method="POST"><input type="hidden" name="bookId" value="<%= book._id %>"><input type="hidden" name="title" value="<%= book.title %>"><input type="hidden" name="author" value="<%= book.author %>"><button class="catalogue-primary-button" type="submit">Request Book</button></form>
+                            <% } else if (book.status === 'pending') { %>
+                                <span class="catalogue-action-note">Already Requested</span>
+                            <% } else if (book.status === 'approved') { %>
+                                <span class="catalogue-action-note">Approved</span>
+                            <% } else if (book.status === 'unavailable' || book.status === 'issued' || book.status === 'overdue') { %>
+                                <span class="catalogue-action-note">Currently Unavailable</span>
+                            <% } %>
+                        </div>
+                    </article>
+                <% }); %>
+            </section>
+        <% } else { %>
+            <div class="catalogue-empty-state">No books found matching your search.</div>
+        <% } %>
+
+        <% if (pagination.totalPages > 1) { %>
+            <nav class="catalogue-pagination" aria-label="Catalogue pagination">
+                <% if (pagination.page > 1) { %><a href="/student/books?page=<%= pagination.page - 1 %>&search=<%= encodeURIComponent(filters.search) %>&category=<%= encodeURIComponent(filters.category) %>&availability=<%= filters.availability %>&sort=<%= filters.sort %>">Previous</a><% } %>
+                <span>Page <%= pagination.page %> of <%= pagination.totalPages %></span>
+                <% if (pagination.page < pagination.totalPages) { %><a href="/student/books?page=<%= pagination.page + 1 %>&search=<%= encodeURIComponent(filters.search) %>&category=<%= encodeURIComponent(filters.category) %>&availability=<%= filters.availability %>&sort=<%= filters.sort %>">Next</a><% } %>
+            </nav>
+        <% } %>
+    </main>
+</body>
+</html>

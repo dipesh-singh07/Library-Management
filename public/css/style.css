@@ -1,0 +1,416 @@
+/* Library Management System - Stylesheet */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+    color: #f1f5f9;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(rgba(15, 23, 42, 0.76), rgba(15, 23, 42, 0.86)),
+                url('/images/library-bg.jpg') center/cover no-repeat fixed;
+    background-color: #0f172a;
+}
+
+/* Header & Navigation */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 2rem;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.brand span {
+    color: #e2b357;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.nav-link {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.nav-link.btn-nav {
+    background: #e2b357;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.nav-link.btn-nav:hover {
+    background: #f1c775;
+}
+
+/* Centered Container for Forms and Home */
+.main-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1.5rem;
+}
+
+/* Card Component */
+.card {
+    background: rgba(30, 41, 59, 0.85);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+    width: 100%;
+    max-width: 460px;
+    padding: 2.5rem;
+}
+
+.card.card-wide {
+    max-width: 600px;
+}
+
+.card-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.card-icon {
+    font-size: 2.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.card-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #f8fafc;
+    margin-bottom: 0.35rem;
+}
+
+.card-subtitle {
+    font-size: 0.95rem;
+    color: #94a3b8;
+}
+
+/* Alert Notification */
+.alert-error {
+    background: rgba(239, 68, 68, 0.18);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 1.35rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    margin-bottom: 0.45rem;
+}
+
+.required {
+    color: #f87171;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #f8fafc;
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #e2b357;
+    box-shadow: 0 0 0 3px rgba(226, 179, 87, 0.25);
+    background: rgba(15, 23, 42, 0.85);
+}
+
+.form-input::placeholder {
+    color: #64748b;
+}
+
+/* Account Type Radio Selector */
+.account-type-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 0.4rem;
+}
+
+.role-radio-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: rgba(15, 23, 42, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    transition: all 0.2s ease;
+}
+
+.role-radio-label input[type="radio"] {
+    accent-color: #e2b357;
+}
+
+.role-radio-label:hover {
+    border-color: rgba(226, 179, 87, 0.5);
+    color: #f8fafc;
+}
+
+.role-radio-label.active {
+    border-color: #e2b357;
+    background: rgba(226, 179, 87, 0.15);
+    color: #e2b357;
+}
+
+/* Conditional Field (Librarian Key) */
+.conditional-field {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.key-hint {
+    display: block;
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-top: 0.35rem;
+}
+
+/* Submit Button */
+.btn-submit {
+    width: 100%;
+    padding: 0.85rem;
+    background: #e2b357;
+    color: #1e293b;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.5rem;
+}
+
+.btn-submit:hover {
+    background: #f1c775;
+    box-shadow: 0 4px 15px rgba(226, 179, 87, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}
+
+/* Card Footer Links */
+.card-footer {
+    text-align: center;
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.9rem;
+    color: #94a3b8;
+}
+
+.card-footer a {
+    color: #e2b357;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.card-footer a:hover {
+    text-decoration: underline;
+}
+
+/* Home / Dashboard Specific Styles */
+.user-info-box {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    text-align: center;
+}
+
+.user-greeting {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #f8fafc;
+    margin-bottom: 0.75rem;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.role-student {
+    background: rgba(56, 189, 248, 0.18);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.role-librarian {
+    background: rgba(226, 179, 87, 0.18);
+    color: #e2b357;
+    border: 1px solid rgba(226, 179, 87, 0.35);
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.btn-primary {
+    display: block;
+    text-align: center;
+    padding: 0.8rem;
+    background: #e2b357;
+    color: #1e293b;
+    border-radius: 8px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background: #f1c775;
+    box-shadow: 0 4px 15px rgba(226, 179, 87, 0.3);
+}
+
+.btn-secondary {
+    display: block;
+    text-align: center;
+    padding: 0.8rem;
+    background: rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.btn-danger {
+    display: block;
+    text-align: center;
+    padding: 0.8rem;
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+    background: rgba(239, 68, 68, 0.28);
+}
+
+.test-routes-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+}
+
+.test-routes-title {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #94a3b8;
+    margin-bottom: 0.75rem;
+}
+
+.test-link {
+    display: inline-block;
+    padding: 0.6rem 1.25rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px dashed rgba(255, 255, 255, 0.25);
+    border-radius: 6px;
+    color: #f1f5f9;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.test-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #e2b357;
+    color: #e2b357;
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+    .card {
+        padding: 1.75rem 1.25rem;
+    }
+    .navbar {
+        padding: 1rem;
+    }
+}

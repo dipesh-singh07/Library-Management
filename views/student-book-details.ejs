@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= book.title %> | Library Portal</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/student.css">
+</head>
+<body class="student-page-body catalogue-page-body">
+    <main class="catalogue-page-shell">
+        <a class="catalogue-back-link" href="/student/books">Back to all books</a>
+        <% if (requestSuccess) { %><div class="profile-alert profile-alert-success">Your request has been sent to the librarian.</div><% } %>
+        <% if (requestError) { %><div class="profile-alert profile-alert-error"><%= requestError %></div><% } %>
+        <article class="book-details-panel">
+            <div class="book-details-cover">
+                <% if (book.image) { %><img src="<%= book.image %>" alt="<%= book.title %>"><% } else { %><span>BOOK</span><% } %>
+            </div>
+            <div class="book-details-content">
+                <span class="catalogue-status status-<%= book.status %>"><%= book.statusLabel %></span>
+                <h1><%= book.title %></h1>
+                <p class="book-details-author">By <%= book.author %></p>
+                <dl class="book-details-facts">
+                    <div><dt>Category</dt><dd><%= book.category %></dd></div>
+                    <% if (book.isbn) { %><div><dt>ISBN</dt><dd><%= book.isbn %></dd></div><% } %>
+                    <% if (book.publisher) { %><div><dt>Publisher</dt><dd><%= book.publisher %></dd></div><% } %>
+                    <% if (book.edition) { %><div><dt>Edition</dt><dd><%= book.edition %></dd></div><% } %>
+                    <% if (book.language) { %><div><dt>Language</dt><dd><%= book.language %></dd></div><% } %>
+                </dl>
+                <% if (book.description) { %><p class="book-details-description"><%= book.description %></p><% } %>
+
+                <div class="book-details-copies">
+                    <div><strong><%= book.availableCopies %></strong><span>Available</span></div>
+                    <div><strong><%= book.issuedCopies %></strong><span>Issued</span></div>
+                    <div><strong><%= book.totalCopies %></strong><span>Total</span></div>
+                </div>
+                <p class="book-details-location"><strong>Library location:</strong> <%= [book.location?.building, book.location?.floor, book.location?.shelf].filter(Boolean).join(' · ') || 'Not specified' %></p>
+                <% if (book.status === 'issued' || book.status === 'overdue' || book.status === 'unavailable') { %><p class="book-details-location"><strong>Expected availability:</strong> <%= book.expectedAvailability %></p><% } %>
+
+                <div class="book-details-actions">
+                    <% if (book.status === 'available') { %>
+                        <form action="/student/request-book" method="POST"><input type="hidden" name="bookId" value="<%= book._id %>"><input type="hidden" name="title" value="<%= book.title %>"><input type="hidden" name="author" value="<%= book.author %>"><input type="hidden" name="returnTo" value="/student/books/<%= book._id %>"><button class="catalogue-secondary-button" type="submit">Request Book</button></form>
+                    <% } else if (book.status === 'pending') { %>
+                        <span class="catalogue-status status-pending">REQUEST PENDING</span>
+                    <% } else if (book.status === 'approved') { %>
+                        <span class="catalogue-action-note">Approved - collect from the library counter</span>
+                    <% } else if (book.status === 'overdue') { %>
+                        <span class="catalogue-action-note">Currently Borrowed - overdue</span>
+                    <% } else if (book.status === 'issued') { %>
+                        <span class="catalogue-action-note">Already Issued</span>
+                    <% } else { %>
+                        <span class="catalogue-action-note">Currently Unavailable</span>
+                        <form action="/student/request-book" method="POST"><input type="hidden" name="bookId" value="<%= book._id %>"><input type="hidden" name="title" value="<%= book.title %>"><input type="hidden" name="author" value="<%= book.author %>"><input type="hidden" name="returnTo" value="/student/books/<%= book._id %>"><button class="catalogue-secondary-button" type="submit">Request Book</button></form>
+                    <% } %>
+                </div>
+            </div>
+        </article>
+    </main>
+</body>
+</html>
